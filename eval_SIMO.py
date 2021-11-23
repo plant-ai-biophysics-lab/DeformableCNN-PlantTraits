@@ -56,33 +56,3 @@ with torch.no_grad():
         print(mse(preds[:,2],targets[:,2]).tolist())
         print(mse(preds[:,3],targets[:,3]).tolist())
         print(mse(preds[:,4],targets[:,4]).tolist())
-# pred=preds
-
-#%%
-Measurements = {}
-
-for i in range(pred.shape[0]):
-    print(testset.df.iloc[i]['RGBImage'])
-    # print(pred[i][0]) #Freshweight
-    # print(pred[i][1]) #Dry weight
-    # print(pred[i][2]) # height
-    image_name = 'Image'+str(i+1)
-    dic = {}
-    dic['RGBImage'] = testset.df.iloc[i]['RGBImage']
-    dic['DebthInformation'] = testset.df.iloc[i]['DebthInformation']
-    dic['FreshWeightShoot'] = pred[i][0].tolist()
-    dic['DryWeightShoot'] = pred[i][1].tolist()
-    dic['Height'] = pred[i][2].tolist()
-    dic['Diameter'] = pred[i][3].tolist()
-    dic['LeafArea'] = pred[i][4].tolist()
-    Measurements[image_name] = dic
-master={}
-master['Measurements']=Measurements
-
-with open('predict.json', 'w') as fp:
-    json.dump(master, fp)
-
-    
-
-
-# %%

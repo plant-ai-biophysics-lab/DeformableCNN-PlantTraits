@@ -70,7 +70,6 @@ inputs=['RGB','D']
 outputs=['FW','DW','H','D','LA']
 
 
-# outputs=['H','D','LA']
 
 for inp in inputs:
     for out in outputs:
@@ -83,8 +82,7 @@ for inp in inputs:
         params = [p for p in model.parameters() if p.requires_grad]
 
         optimizer=torch.optim.Adam(params, lr=0.0005, betas=(0.9, 0.999), eps=1e-08, weight_decay=0, amsgrad=False)
-        # scheduler = lr_scheduler.StepLR(optimizer, step_size=400, gamma=0.6)
-        # optimizer = torch.optim.SGD(params, lr=0.0004, momentum=0.9)
+
         criterion=NMSELoss()
 
 
@@ -181,8 +179,6 @@ for inp in inputs:
             if current_val_loss<best_val_loss or best_val_loss==None:
                 best_val_loss=current_val_loss
                 torch.save(model.state_dict(), './experiments1/DCN_midfusionresnet18_SISO_'+inp+'_'+out+'.pth')
-                # if best_val_loss<1.8:
-                #     optimizer.param_groups[0]['lr']=0.5*optimizer.param_groups[0]['lr']
                 print('Best model Saved! Val NMSE: ', str(best_val_loss))
                 with open('run.txt', 'a') as f:
                     f.write('\n')

@@ -15,21 +15,10 @@ import pandas as pd
 import json
 
 
-# dataset=GreenhouseDataset(image_dir='/data2/greenhouse-data/train-images/',jsonfile_dir='/data2/greenhouse-data/train-gt/GroundTruth.json', transforms=get_transforms(train=False))
-# dataset=GreenhouseMISOMidFusionDataset(image_dir='/data2/greenhouse-data/train-images/',jsonfile_dir='/data2/greenhouse-data/train-gt/GroundTruth.json', transforms=get_transforms(train=False))
 
-# split_seed=12
-
-# train, val = trainval_split(dataset, val_fraction=0.25, split_seed=split_seed)
-
-# dataset.set_indices(train.indices, val.indices)
-
-
-# testset=GreenhouseDataset(image_dir='/data2/greenhouse-data/train-images/',jsonfile_dir='/data2/greenhouse-data/train-gt/GroundTruth_SendJuly6.json', transforms=get_transforms(train=False))
 testset=GreenhouseDataset(rgb_dir='/data/pvraja/greenhouse-data/RGBImages/',d_dir='/data/pvraja/greenhouse-data/DepthImages/',jsonfile_dir='/data/pvraja/greenhouse-data/GroundTruth/GroundTruth_All_388_Images.json', transforms=get_RGB_transforms(train=False))
 
-# testset.means=dataset.means
-# testset.stds=dataset.stds
+
 testset.df=testset.df[-50:]
 # tes
 
@@ -41,8 +30,7 @@ device=torch.device('cuda')
 
 cri=NMSELoss()
 mse=nn.MSELoss()
-# diff_df = pd.merge(dataset.df, testset.df, how='outer', indicator=True, on='RGBImage')
-# diff_df = diff_df[diff_df._merge != 'both']
+
 
 inp='D'
 outputs=['FW','DW','H','D','LA']
@@ -90,34 +78,3 @@ with torch.no_grad():
         print('SISO ',o,' MSE loss: ', mse_loss.tolist())
 
     f_nmse=cri(final, all_targets)
-
-# pred=preds
-
-#%%
-Measurements = {}
-
-for i in range(pred.shape[0]):
-    print(testset.df.iloc[i]['RGBImage'])
-    # print(pred[i][0]) #Freshweight
-    # print(pred[i][1]) #Dry weight
-    # print(pred[i][2]) # height
-    image_name = 'Image'+str(i+1)
-    dic = {}
-    dic['RGBImage'] = testset.df.iloc[i]['RGBImage']
-    dic['DebthInformation'] = testset.df.iloc[i]['DebthInformation']
-    dic['FreshWeightShoot'] = pred[i][0].tolist()
-    dic['DryWeightShoot'] = pred[i][1].tolist()
-    dic['Height'] = pred[i][2].tolist()
-    dic['Diameter'] = pred[i][3].tolist()
-    dic['LeafArea'] = pred[i][4].tolist()
-    Measurements[image_name] = dic
-master={}
-master['Measurements']=Measurements
-
-with open('predict.json', 'w') as fp:
-    json.dump(master, fp)
-
-    
-
-
-# %%

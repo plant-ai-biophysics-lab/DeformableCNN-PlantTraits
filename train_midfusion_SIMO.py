@@ -14,23 +14,15 @@ from sklearn.model_selection import train_test_split, StratifiedKFold
 from torch.optim import lr_scheduler
 
 
-# dataset=GreenhouseDataset(image_dir='/data2/greenhouse-data/train-images/',jsonfile_dir='/data2/greenhouse-data/train-gt/GroundTruth_SendJuly6.json', transforms=get_transforms(train=False))
-
-# dataset=GreenhouseMidFusionDataset(image_dir='/data2/greenhouse-data/train-images/',jsonfile_dir='/data2/greenhouse-data/train-gt/GroundTruth_SendJuly13.json', transforms=get_transforms(train=False))
-
 
 dataset=GreenhouseDataset(rgb_dir='/data/pvraja/greenhouse-data/RGBImages/',d_dir='/data/pvraja/greenhouse-data/DepthImages/',jsonfile_dir='/data/pvraja/greenhouse-data/GroundTruth/GroundTruth_All_388_Images.json', transforms=get_RGB_transforms(train=False))
 dataset.df=dataset.df.iloc[:-50]
-# dataset.df=dataset.df.iloc[:-99]
-# dataset=GreenhouseDataset(image_dir='/data2/greenhouse-data/train-images/',jsonfile_dir='/data2/greenhouse-data/train-gt/GroundTruth_SendJuly6.json', transforms=get_transforms(train=False))
 
 
 split_seed=12
 
 train_split, val_split = train_test_split(dataset.df, test_size=0.2, random_state=split_seed, stratify=dataset.df['Variety'])
-# skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=split_seed)
-# trainsets=[]
-# for train_split,val_split in skf.split(X=dataset.df, y=dataset.df['Variety']): 
+
 train = torch.utils.data.Subset(dataset, train_split.index.tolist())
 val = torch.utils.data.Subset(dataset, val_split.index.tolist())
 
@@ -38,16 +30,6 @@ dataset.set_indices(train.indices, val.indices)
 
 
 
-    
-
-train_wts = torch.tensor(np.array(1-dataset.train_df['rel_freq']), dtype=torch.float32)
-# val_wts = torch.tensor(np.array(1-dataset.val_df['rel_freq']), dtype=torch.float32)
-
-
-# Instantiate samplers
-# train_sampler = torch.utils.data.WeightedRandomSampler(train_wts, replacement=True, num_samples=150)
-
-# val_sampler = torch.utils.data.WeightedRandomSampler(val_wts, replacement=True, num_samples=70)
 
 train_loader = torch.utils.data.DataLoader(train, batch_size=15,num_workers=12, shuffle=True)#, sampler=train_sampler)
 val_loader = torch.utils.data.DataLoader(val, batch_size=15, shuffle=False, num_workers=12)#, sampler=val_sampler)
@@ -84,10 +66,6 @@ val_loader = torch.utils.data.DataLoader(val, batch_size=15, shuffle=False, num_
 
 
 # %%
-# import kornia
-# import torch; import torch.nn as nn;
-# t = lambda x: torch.tensor(x); p = lambda x: nn.Parameter(t(x))
-# torch.manual_seed(42);
 
 device=torch.device('cuda')
 inputs=['RGB','D']
@@ -97,20 +75,13 @@ for inp in inputs:
     dataset.input=inp
     
     model= GreenhouseMidFusionRegressor(input=inp, num_outputs=5, conv_type='deformable')
-    # model=GreenhouseGatedEnsembleRegressor()
-    # crop=kornia.augmentation.CenterCrop((p([700.0]),p([800.0])))
-    # model=nn.Sequential(crop, model)
-    # model= GreenhouseRegressor()
-
-    # model.load_state_dict(torch.load('./saved_models/midfusionresnet18ensemble_2.pth'))
 
     model.to(device)
 
     params = [p for p in model.parameters() if p.requires_grad]
 
     optimizer=torch.optim.Adam(params, lr=0.0005, betas=(0.9, 0.999), eps=1e-08, weight_decay=0, amsgrad=False)
-    # scheduler = lr_scheduler.StepLR(optimizer, step_size=400, gamma=0.6)
-    # optimizer = torch.optim.SGD(params, lr=0.0004, momentum=0.9)
+
     criterion=NMSELoss()
 
 
@@ -137,10 +108,8 @@ for inp in inputs:
             
 
             loss=criterion(preds, targets)
-            # acc=nmse(preds.detach(), targets)
 
             current_val_loss=current_val_loss+loss.tolist()
-            # training_val_loss=training_val_loss+loss.detach().cpu().numpy()
             
 
         best_val_loss=current_val_loss
@@ -222,3 +191,4 @@ for inp in inputs:
         # scheduler.step()
         
 # %%
+ 

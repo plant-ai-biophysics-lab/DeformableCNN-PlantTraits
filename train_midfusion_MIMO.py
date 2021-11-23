@@ -70,10 +70,7 @@ val_loader = torch.utils.data.DataLoader(val, batch_size=15, shuffle=False, num_
 
 
 # %%
-# import kornia
-# import torch; import torch.nn as nn;
-# t = lambda x: torch.tensor(x); p = lambda x: nn.Parameter(t(x))
-# torch.manual_seed(42);
+
 
 sav_dir='./DCN/'
 experiment_name='midfusionresnet18_offsets8_MIMO_RELU1-3/'
@@ -84,20 +81,12 @@ device=torch.device('cuda')
 model= GreenhouseMidFusionRegressor(input='RGB-D',num_outputs=5, conv_type='deformable')
 
 #%%
-# model=GreenhouseGatedEnsembleRegressor()
-# crop=kornia.augmentation.CenterCrop((p([700.0]),p([800.0])))
-# model=nn.Sequential(crop, model)
-# model= GreenhouseRegressor()
-
-# model.load_state_dict(torch.load('./saved_models/midfusionresnet18ensemble_2.pth'))
-
 model.to(device)
 
 params = [p for p in model.parameters() if p.requires_grad]
 
 optimizer=torch.optim.Adam(params, lr=0.0005, betas=(0.9, 0.999), eps=1e-08, weight_decay=0, amsgrad=False)
-# scheduler = lr_scheduler.StepLR(optimizer, step_size=400, gamma=0.6)
-# optimizer = torch.optim.SGD(params, lr=0.0004, momentum=0.9)
+
 criterion=NMSELoss()
 
 
