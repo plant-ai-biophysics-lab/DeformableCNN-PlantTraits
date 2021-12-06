@@ -31,7 +31,7 @@ training_category = 'MIMO' #'MIMO', 'MISO', 'SIMO', 'SISO'
 if training_category   == 'MIMO':
     transform_type = get_transforms(train=False) 
     inputs=['RGB-D']
-    outputs=[] #??
+    outputs=['All'] #??
     NumOutputs    = 5
     
 elif training_category == 'MISO':
@@ -43,7 +43,7 @@ elif training_category == 'MISO':
 elif training_category == 'SIMO':
     transform_type = get_RGB_transforms(train=False)
     inputs=['RGB','D']
-    outputs=[] # ??
+    outputs=['All'] # ??
     NumOutputs    = 5
     
 elif training_category == 'SISO':
