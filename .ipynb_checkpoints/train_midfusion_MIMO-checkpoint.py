@@ -77,11 +77,6 @@ experiment_name='midfusionresnet18_offsets8_MIMO_RELU1-3/'
 
 if not os.path.exists(sav_dir+experiment_name):
     os.mkdir(sav_dir+experiment_name)
-
-    
-    
-    
-    
 device=torch.device('cuda')
 model= GreenhouseMidFusionRegressor(input='RGB-D',num_outputs=5, conv_type='deformable')
 
@@ -103,8 +98,6 @@ current_val_loss=0
 # training_val_loss=0
 model.eval()
 dataset.transforms=get_transforms(train=False)
-
-
 with torch.no_grad():
     for i, (rgbd, targets) in enumerate(val_loader):
         # print(rgb.shape, d.shape)

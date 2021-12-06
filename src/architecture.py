@@ -60,11 +60,11 @@ class DeformConv2d(torch.nn.Module):
 
 
 class GreenhouseMidFusionRegressor(torch.nn.Module):
-    def __init__(self, input='RGB-D',num_outputs=5, conv_type='standard'):
+    def __init__(self, input_data_type='RGB-D',num_outputs=5, conv_type='standard'):
         super(GreenhouseMidFusionRegressor, self).__init__()
-        self.input=input
+        self.input_data_type=input_data_type
 
-        if self.input=='RGB-D':
+        if self.input_data_type=='RGB-D':
             self.rgbencoder= torchvision.models.resnet18(pretrained=True)
             self.depthencoder= torchvision.models.resnet18(pretrained=True)
             if conv_type=='deformable':
@@ -91,7 +91,8 @@ class GreenhouseMidFusionRegressor(torch.nn.Module):
             self.first_linear=nn.Linear(2000, 1000)
             self.second_linear=nn.Linear(1000, 500)
             self.final_linear=nn.Linear(500, num_outputs)
-        if self.input=='RGB' or self.input=='D':
+            
+        if self.input_data_type=='RGB' or self.input_data_type=='D':
             self.encoder= torchvision.models.resnet18(pretrained=True)
             weights_tmp = self.encoder.conv1.weight
             if conv_type=='deformable': 
@@ -102,7 +103,7 @@ class GreenhouseMidFusionRegressor(torch.nn.Module):
                 self.encoder.layer3=self.deform(self.encoder.layer3)
                 self.encoder.layer4=self.deform(self.encoder.layer4)
 
-            if self.input=='D':
+            if self.input_data_type=='D':
                 if conv_type=='deformable':
                     self.encoder=nn.Sequential(DeformConv2d(1, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False),nn.ReLU, self.encoder)
                 else:
@@ -117,7 +118,7 @@ class GreenhouseMidFusionRegressor(torch.nn.Module):
 
 
     def forward(self, inp):
-        if self.input=='RGB-D':
+        if self.input_data_type=='RGB-D':
             x_rgb=inp[:,:3,:,:]
             x_depth=inp[:,3:,:,:]
             x_rgb=self.rgbencoder(x_rgb)
