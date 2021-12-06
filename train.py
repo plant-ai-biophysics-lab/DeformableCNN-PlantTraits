@@ -99,29 +99,6 @@ for In in inputs:
         current_val_loss=0
         # training_val_loss=0
            
-        model.eval()
-                                
-        if inp=='RGB':
-            dataset.transforms=get_RGB_transforms(train=False)
-        elif inp=='D':
-            dataset.transforms=get_D_transforms(train=False)
-        elif inp=='RGB-D': 
-            dataset.transforms=get_transforms(train=False)
-                  
-        with torch.no_grad():
-            for i, (rgbd, targets) in enumerate(val_loader):
-
-                rgbd=rgbd.to(device)
-                # d=d.to(device)
-                targets=targets.to(device)
-                preds=model(rgbd)
-                loss=criterion(preds, targets)
-                # acc=nmse(preds.detach(), targets)
-                current_val_loss=current_val_loss+loss.tolist()
-                # training_val_loss=training_val_loss+loss.detach().cpu().numpy()
-                
-            best_val_loss=current_val_loss
-
         writer = SummaryWriter()
         start=time.time()
                                 
