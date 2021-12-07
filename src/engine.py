@@ -74,3 +74,4 @@ def validate(model, In, dataset, device, criterion, writer, epoch, val_loader, b
         with open('run.txt', 'a') as f:
                     f.write('\n')
                     f.write('Model is not good (might be overfitting)! Current val NMSE: '+ str(current_val_loss)+ 'Best Val NMSE: '+ str(best_val_loss))
+    return best_val_loss

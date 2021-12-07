@@ -108,7 +108,7 @@ for In in inputs:
                 f.write('Epoch: '+ str(epoch+1)+ ', Time Elapsed: '+ str((time.time()-start)/60)+' mins')
             print('Epoch: ', str(epoch+1), ', Time Elapsed: ', str((time.time()-start)/60),' mins')
 
-            train(model, In, dataset, device, criterion, optimizer, writer, epoch, train_loader):
+            train(model, In, dataset, device, criterion, optimizer, writer, epoch, train_loader)
 
             validate(model, In, dataset, device, criterion, writer, epoch, val_loader, best_val_loss)
         # scheduler.step()
