@@ -110,7 +110,7 @@ for In in inputs:
 
             train(model, In, dataset, device, criterion, optimizer, writer, epoch, train_loader)
 
-            validate(model, In, dataset, device, criterion, writer, epoch, val_loader, best_val_loss)
+            best_val_loss=validate(model, In, dataset, device, criterion, writer, epoch, val_loader, best_val_loss)
         # scheduler.step()
         
 # %%
