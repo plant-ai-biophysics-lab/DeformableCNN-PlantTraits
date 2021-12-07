@@ -9,7 +9,7 @@ def train(model, In, dataset, device, criterion, optimizer, writer, epoch, train
     elif In=='D':
         dataset.transforms=get_D_transforms(train=True)
     elif In=='RGB-D': 
-        dataset.transforms=get_transforms(train=False)
+        dataset.transforms=get_transforms(train=True)
                         
     for i, (rgbd, targets)  in enumerate(train_loader):
         rgbd=rgbd.to(device)
@@ -34,8 +34,7 @@ def train(model, In, dataset, device, criterion, optimizer, writer, epoch, train
 
 def validate(model, In, dataset, device, criterion, writer, epoch, val_loader, best_val_loss):
     current_val_loss=0
-    # training_val_loss=0
-                        
+    # training_val_loss=0s           
                         
     model.eval()
     print('val')
