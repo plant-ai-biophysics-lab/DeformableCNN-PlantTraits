@@ -1,7 +1,8 @@
 from torch.functional import split
-from datatools import *
+from .src.datatools import *
+from .src.engine import train, validate
 import torch, torchvision
-from architecture import GreenhouseMidFusionRegressor
+from .src.architecture import GreenhouseMidFusionRegressor
 from nmse import NMSELoss
 from torch.utils.data import DataLoader
 import torch.nn as nn
@@ -11,6 +12,7 @@ import time
 from sklearn.model_selection import train_test_split, StratifiedKFold
 from torch.optim import lr_scheduler
 import os
+
 
    
 sav_dir='./DCN/'
@@ -31,7 +33,7 @@ training_category = 'MIMO' #'MIMO', 'MISO', 'SIMO', 'SISO'
 if training_category   == 'MIMO':
     transform_type = get_transforms(train=False) 
     inputs=['RGB-D']
-    outputs=['All'] #??
+    outputs=['All']
     NumOutputs    = 5
     
 elif training_category == 'MISO':
@@ -43,7 +45,7 @@ elif training_category == 'MISO':
 elif training_category == 'SIMO':
     transform_type = get_RGB_transforms(train=False)
     inputs=['RGB','D']
-    outputs=['All'] # ??
+    outputs=['All']
     NumOutputs    = 5
     
 elif training_category == 'SISO':
@@ -64,12 +66,10 @@ dataset.df= dataset.df.iloc[:-50]
 train_split, val_split = train_test_split(dataset.df, test_size=0.2, random_state=split_seed, stratify=dataset.df['Variety'])
 
 train = torch.utils.data.Subset(dataset, train_split.index.tolist())
-val   = torch.utils.data.Subset(dataset, val_split.index.tolist()
+val   = torch.utils.data.Subset(dataset, val_split.index.tolist())
 dataset.set_indices(train.indices, val.indices)
                                                                                      
                                 
-train_wts = torch.tensor(np.array(1-dataset.train_df['rel_freq']), dtype=torch.float32) # did noe see where has been used data sampler! ???
-
 train_loader = torch.utils.data.DataLoader(train, batch_size=15, num_workers=12, shuffle=True)#, sampler=train_sampler)
 val_loader   = torch.utils.data.DataLoader(val,   batch_size=15, shuffle=False, num_workers=12)#, sampler=val_sampler)
 
@@ -91,7 +91,7 @@ for In in inputs:
         dataset.out  =Out                        
 
         device=torch.device('cuda')
-        model= GreenhouseMidFusionRegressor(input_data_type=InputDataType, num_outputs=NumOutputs, conv_type=ConvType)
+        model= GreenhouseMidFusionRegressor(input_data_type=In, num_outputs=NumOutputs, conv_type=ConvType)
         model.to(device)
     
                                 
@@ -107,76 +107,10 @@ for In in inputs:
                 f.write('\n')
                 f.write('Epoch: '+ str(epoch+1)+ ', Time Elapsed: '+ str((time.time()-start)/60)+' mins')
             print('Epoch: ', str(epoch+1), ', Time Elapsed: ', str((time.time()-start)/60),' mins')
-            model.train()
-                                
-                                
-            if inp=='RGB':
-                dataset.transforms=get_RGB_transforms(train=True)
-            elif inp=='D':
-                dataset.transforms=get_D_transforms(train=True)
-            elif inp=='RGB-D': 
-                dataset.transforms=get_transforms(train=False)
-                                
-            for i, (rgbd, targets)  in enumerate(train_loader):
-                rgbd=rgbd.to(device)
-                # d=d.to(device)
-                targets=targets.to(device)
-                preds=model(rgbd)
 
-                loss=criterion(preds, targets)
-                # with torch.no_grad():
-                #     acc=nmse(preds.detach(), targets)
+            train(model, In, dataset, device, criterion, optimizer, writer, epoch, train_loader):
 
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
-                print('Train NMSE: ', str(loss.tolist()))
-                with open('run.txt', 'a') as f:
-                    f.write('\n')
-                    f.write('Train NMSE: '+ str(loss.tolist()))
-                # writer.add_scalar("MSE Loss/train", loss, (epoch*train_loader.sampler.num_samples+i)/train_loader.sampler.num_samples)
-                writer.add_scalar("NMSE Loss/train", loss, (epoch*train_loader.sampler.num_samples+i)/train_loader.sampler.num_samples)
-            current_val_loss=0
-            # training_val_loss=0
-                                
-                                
-            model.eval()
-            print('val')
-                                
-            if inp=='RGB':
-                dataset.transforms=get_RGB_transforms(train=False)
-            elif inp=='D':
-                dataset.transforms=get_D_transforms(train=False)
-            elif inp=='RGB-D': 
-                dataset.transforms=get_transforms(train=False)
-            with torch.no_grad():
-                for i, (rgbd, targets) in enumerate(val_loader):
-
-                    rgbd=rgbd.to(device)
-                    # d=d.to(device)
-                    targets=targets.to(device)
-                    preds=model(rgbd)
-                    loss=criterion(preds, targets)
-                    # acc=nmse(preds.detach(), targets)
-                    current_val_loss=current_val_loss+loss.tolist()
-                    # training_val_loss=training_val_loss+loss.detach().cpu().numpy()
-
-                # writer.add_scalar("MSE Loss/val", training_val_loss, epoch)
-                writer.add_scalar("NMSE Loss/val", current_val_loss, epoch)
-                    
-            if current_val_loss<best_val_loss or best_val_loss==None:
-                best_val_loss=current_val_loss
-                torch.save(model.state_dict(), './experiments1/DCN_midfusionresnet18_SISO_' + inp + '_' + out + '.pth') # should be fixed! 
-                print('Best model Saved! Val NMSE: ', str(best_val_loss))
-                with open('run.txt', 'a') as f:
-                    f.write('\n')
-                    f.write('Best model Saved! Val NMSE: '+ str(best_val_loss))
-                
-            else:
-                print('Model is not good (might be overfitting)! Current val NMSE: ', str(current_val_loss), 'Best Val NMSE: ', str(best_val_loss))
-                with open('run.txt', 'a') as f:
-                    f.write('\n')
-                    f.write('Model is not good (might be overfitting)! Current val NMSE: '+ str(current_val_loss)+ 'Best Val NMSE: '+ str(best_val_loss))
+            validate(model, In, dataset, device, criterion, writer, epoch, val_loader, best_val_loss)
         # scheduler.step()
         
 # %%
