@@ -1,10 +1,10 @@
 #%%
 from torch.functional import split
-from src.datatools import *
-from src.engine import train, validate
+from datatools import *
+from engine import train, validate
 import torch, torchvision
-from src.architecture import GreenhouseMidFusionRegressor
-from src.nmse import NMSELoss
+from architecture import GreenhouseMidFusionRegressor
+from nmse import NMSELoss
 from torch.utils.data import DataLoader
 import torch.nn as nn
 import numpy as np
