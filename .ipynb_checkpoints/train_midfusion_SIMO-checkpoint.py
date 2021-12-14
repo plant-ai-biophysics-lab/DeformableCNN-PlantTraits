@@ -105,6 +105,7 @@ for inp in inputs:
             targets=targets.to(device)
             preds=model(rgbd)
 
+            
 
             loss=criterion(preds, targets)
 
