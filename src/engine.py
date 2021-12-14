@@ -1,14 +1,14 @@
 from .datatools import get_RGB_transforms, get_D_transforms, get_transforms
 import torch
-def train(model, In, dataset, device, criterion, optimizer, writer, epoch, train_loader):
+def train_single_epoch(model, dataset, device, criterion, optimizer, writer, epoch, train_loader):
     model.train()
                         
                         
-    if In=='RGB':
+    if dataset.input=='RGB':
         dataset.transforms=get_RGB_transforms(train=True)
-    elif In=='D':
+    elif dataset.input=='D':
         dataset.transforms=get_D_transforms(train=True)
-    elif In=='RGB-D': 
+    elif dataset.input=='RGB-D': 
         dataset.transforms=get_transforms(train=True)
                         
     for i, (rgbd, targets)  in enumerate(train_loader):
@@ -32,18 +32,18 @@ def train(model, In, dataset, device, criterion, optimizer, writer, epoch, train
         writer.add_scalar("NMSE Loss/train", loss, (epoch*train_loader.sampler.num_samples+i)/train_loader.sampler.num_samples)
     # training_val_loss=0
 
-def validate(model, In, dataset, device, criterion, writer, epoch, val_loader, best_val_loss):
+def validate(model, dataset, device, training_category, sav_dir, criterion, writer, epoch, val_loader, best_val_loss):
     current_val_loss=0
     # training_val_loss=0s           
                         
     model.eval()
     print('val')
                         
-    if In=='RGB':
+    if dataset.input=='RGB':
         dataset.transforms=get_RGB_transforms(train=False)
-    elif In=='D':
+    elif dataset.input=='D':
         dataset.transforms=get_D_transforms(train=False)
-    elif In=='RGB-D': 
+    elif dataset.input=='RGB-D': 
         dataset.transforms=get_transforms(train=False)
     with torch.no_grad():
         for i, (rgbd, targets) in enumerate(val_loader):
@@ -60,9 +60,9 @@ def validate(model, In, dataset, device, criterion, writer, epoch, val_loader, b
         # writer.add_scalar("MSE Loss/val", training_val_loss, epoch)
         writer.add_scalar("NMSE Loss/val", current_val_loss, epoch)
             
-    if current_val_loss<best_val_loss or best_val_loss==None:
+    if current_val_loss<best_val_loss or epoch==0:
         best_val_loss=current_val_loss
-        torch.save(model.state_dict(), './experiments1/DCN_midfusionresnet18_SISO_' + In + '_' + Out + '.pth') # should be fixed! 
+        torch.save(model.state_dict(), sav_dir+'bestmodel'+training_category+'_' + dataset.input + '_' + dataset.out + '.pth') # should be fixed! 
         print('Best model Saved! Val NMSE: ', str(best_val_loss))
         with open('run.txt', 'a') as f:
             f.write('\n')

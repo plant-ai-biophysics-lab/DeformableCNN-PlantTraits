@@ -32,29 +32,17 @@ class DeformConv2d(torch.nn.Module):
         self.deformable_layer= ops.DeformConv2d(self.in_channels, self.out_channels, self.kernel_size, self.stride, self.padding, self.dilation, self.groups, self.bias)
         self.offset_layer=nn.Conv2d(self.in_channels, 2*self.n_offsets*self.kernel_size[0]*self.kernel_size[1], self.kernel_size, self.stride, self.padding,self.dilation,self.groups, self.bias)
 
-    def activations_hook(self, grad):
-        self.gradients = grad
         
     def forward(self, x):
-        # self.offset_in=x
-        self.x=x
 
         offset=self.offset_layer(x)
-        self.offsets=offset.detach().cpu()
-        h = offset.register_hook(self.activations_hook)
-        o=self.deformable_layer(x,offset)
-        # h = o.register_hook(self.activations_hook)
-        return o
+
+        return self.deformable_layer(x,offset)
     
     def weight_replace(self, weights):
         self.deformable_layer.weight=weights
 
-    def get_activations_gradient(self):
-        return self.gradients
-    
-    # method for the activation exctraction
-    def get_activations(self, x):
-        return self.offset_layer(x)
+
 
 
 

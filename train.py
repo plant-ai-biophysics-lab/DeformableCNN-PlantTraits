@@ -1,7 +1,7 @@
 #%%
 from torch.functional import split
 from src.datatools import *
-from src.engine import train, validate
+from src.engine import train_single_epoch, validate
 import torch, torchvision
 from src.architecture import GreenhouseMidFusionRegressor
 from src.nmse import NMSELoss
@@ -17,9 +17,8 @@ import os
 
    
 sav_dir='./DCN/'
-experiment_name='midfusionresnet18_offsets8_MIMO_RELU1-3/'
-if not os.path.exists(sav_dir+experiment_name):
-    os.mkdir(sav_dir+experiment_name)
+if not os.path.exists(sav_dir):
+    os.mkdir(sav_dir)
 RGB_Data_Dir   = '/data/pvraja/greenhouse-data/RGBImages/'
 Depth_Data_Dir = '/data/pvraja/greenhouse-data/DepthImages/'  
 JSON_Files_Dir = '/data/pvraja/greenhouse-data/GroundTruth/GroundTruth_All_388_Images.json'
@@ -96,7 +95,7 @@ for In in inputs:
         model.to(device)
     
                                 
-        best_val_loss=None # initial dummy value
+        best_val_loss=9999999 # initial dummy value
         current_val_loss=0
         # training_val_loss=0
            
@@ -109,9 +108,9 @@ for In in inputs:
                 f.write('Epoch: '+ str(epoch+1)+ ', Time Elapsed: '+ str((time.time()-start)/60)+' mins')
             print('Epoch: ', str(epoch+1), ', Time Elapsed: ', str((time.time()-start)/60),' mins')
 
-            train(model, In, dataset, device, criterion, optimizer, writer, epoch, train_loader)
+            train_single_epoch(model, dataset, device, criterion, optimizer, writer, epoch, train_loader)
 
-            best_val_loss=validate(model, In, dataset, device, criterion, writer, epoch, val_loader, best_val_loss)
+            best_val_loss=validate(model, dataset, device, training_category, sav_dir, criterion, writer, epoch, val_loader, best_val_loss)
         # scheduler.step()
         
 # %%
