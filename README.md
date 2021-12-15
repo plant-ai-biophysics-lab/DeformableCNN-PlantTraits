@@ -14,4 +14,4 @@ Either use `eval.py` or run the evaluation cells in the `example.ipynb` notebook
 
 ## Acknowledgments
 
-This project was partly funded by the [National AI Institute for Food Systems (AIFS)](www.aifs.ucdavis.edu).
+This project was partly funded by the [National AI Institute for Food Systems (AIFS)](https://aifs.ucdavis.edu).
