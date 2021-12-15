@@ -11,6 +11,6 @@ Either use `train.py` or run the training cells in the `example.ipynb` notebook.
 
 Either use eval.py or run the evaluation cells in the example notebook. Keep in mind these cells require GT in order to quntify error. For deployment, load the image, load the model, pass the image through the model, and the output will be the plant traits.
 
+## Acknowledgments
 
-
-
+This project was partly funded by the [National AI Institute for Food Systems (AIFS)](www.aifs.ucdavis.edu).
