@@ -1,7 +1,7 @@
 # DeformableCNNLettuceRegressor
 
-**[Paper Link](https://arxiv.org/pdf/2112.03205.pdf)**
-
+ As described in the paper **[Simultaneously Predicting Multiple Plant Traits from Multiple Sensors via Deformable CNN Regression
+](https://arxiv.org/pdf/2112.03205.pdf)**, we find that deformble achieive higher performance on the autonomous greenhouse dataset. The pipeline provided allows users to train their own models on the autonomous greenhouse or a custom data set.
 
 ## Training
 
