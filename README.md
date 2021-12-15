@@ -10,7 +10,7 @@ Either use `train.py` or run the training cells in the `example.ipynb` notebook.
 
 ## Evaluation
 
-Either use eval.py or run the evaluation cells in the example notebook. Keep in mind these cells require GT in order to quntify error. For deployment, load the image, load the model, pass the image through the model, and the output will be the plant traits.
+Either use `eval.py` or run the evaluation cells in the `example.ipynb` notebook. Keep in mind that these cells require ground-truth values in order to quntify error. For deployment, load the image, load the model, pass the image through the model, and the model will output continuous plant traits values.
 
 ## Acknowledgments
 
