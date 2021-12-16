@@ -6,11 +6,11 @@ See accepted [2022 AAAI AI for Ag and Food Systems workshop](https://aiafs-aaai2
 
 ## Training
 
-Either use `train.py` or run the training cells in the `example.ipynb` notebook. Change hyperparameters and training options accordingly.
+Either use `train.py` or run the training cells in the [example notebook](https://colab.research.google.com/github/plant-ai-biophysics-lab/DeformableCNN-PlantTraits/blob/main/example.ipynb). Change hyperparameters and training options accordingly.
 
 ## Evaluation
 
-Either use `eval.py` or run the evaluation cells in the `example.ipynb` notebook. Keep in mind that these cells require ground-truth values in order to quntify error. For deployment, load the image, load the model, pass the image through the model, and the model will output continuous plant traits values.
+Either use `eval.py` or run the evaluation cells in the [example notebook](https://colab.research.google.com/github/plant-ai-biophysics-lab/DeformableCNN-PlantTraits/blob/main/example.ipynb). Keep in mind that these cells require ground-truth values in order to quntify error. For deployment, load the image, load the model, pass the image through the model, and the model will output continuous plant traits values.
 
 ## Acknowledgments
 
