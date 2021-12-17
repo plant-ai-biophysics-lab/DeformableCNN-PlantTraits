@@ -66,14 +66,9 @@ def trainval_split(dataset, val_fraction=0.7, split_seed=0):
 class GreenhouseDataset(Dataset):
     def __init__(self, rgb_dir, d_dir, jsonfile_dir, transforms=None, input='RGB-D',output='All'):
 
-        df= pd.read_json(jsonfile_dir)
+        self.df= pd.read_json(jsonfile_dir)
         # flatten_json is a costum function to flat the nested json files!
-        flatten_nestedjson = pd.DataFrame([flatten_json(x) for x in df['Measurements']])
-        flatten_nestedjson = flatten_nestedjson.drop(labels=[0,1,2,3], axis=0)
-        flatten_nestedjson = flatten_nestedjson.dropna(axis='columns')
         
-
-        self.df=flatten_nestedjson.reset_index()
         self.transforms = transforms
         self.rgb_dir=rgb_dir
         self.d_dir=d_dir
@@ -86,32 +81,21 @@ class GreenhouseDataset(Dataset):
         row=self.df.iloc[idx]
 
         if self.input=='RGB':
-            rgbd = plt.imread(self.rgb_dir+row['RGB_Image'])
+            rgbd = plt.imread(self.rgb_dir+row['image'])
         if self.input=='D':
-            rgbd = plt.imread(self.d_dir+row['Depth_Information'])
+            rgbd = plt.imread(self.d_dir+row['depth_image'])
             rgbd=np.expand_dims(rgbd,2)
         if self.input=='RGB-D': 
-            rgb = plt.imread(self.rgb_dir+row['RGB_Image'])
-            depth = plt.imread(self.d_dir+row['Depth_Information'])
+            rgb = plt.imread(self.rgb_dir+row['image'])
+            depth = plt.imread(self.d_dir+row['depth_image'])
             rgbd = np.dstack([rgb,depth])
         
         # load GT regression data
-        if self.out=='FW':
-            target=[row['FreshWeightShoot']] 
-        elif self.out=='DW':
-            target=[row['DryWeightShoot']]
-        elif self.out=='H':
-            target=[row['Height']]
-        elif self.out=='D':
-            target=[row['Diameter']]
-        elif self.out=='LA':
-            target=[row['LeafArea']]
-        elif self.out=='All':
-            target=[row['FreshWeightShoot'], 
-                row['DryWeightShoot'],
-                row['Height'],
-                row['Diameter'],
-                row['LeafArea']]
+        if self.out=='ALL':
+            target=list(row['outputs']['regression'].values())
+        else:
+            target=[row['outputs']['regression'][self.out]]
+
 
 
         #make sure your img and mask array are in this format before passing into albumentations transforms, img.shape=[H, W, C]
@@ -130,37 +114,21 @@ class GreenhouseDataset(Dataset):
     def __len__(self):
         return len(self.df)
 
-    def set_indices(self, train_indices, val_indices):
-        train_df=self.df.iloc[train_indices]
-        self.means={'FreshWeightShoot': train_df['FreshWeightShoot'].mean(), 
-            'DryWeightShoot': train_df['DryWeightShoot'].mean(),
-            'Height': train_df['Height'].mean(),
-            'Diameter': train_df['Diameter'].mean(),
-            'LeafArea': train_df['LeafArea'].mean()}
-        self.stds={'FreshWeightShoot': train_df['FreshWeightShoot'].std(), 
-            'DryWeightShoot': train_df['DryWeightShoot'].std(),
-            'Height': train_df['Height'].std(),
-            'Diameter': train_df['Diameter'].std(),
-            'LeafArea': train_df['LeafArea'].std()}
-        self.train_df=train_df
-        self.val_df=self.df.iloc[val_indices]
-
-
 
 
 ## FIGURE OUT HOW TO CROP ALL THE IMAGES TO GET RID OF EXTRANIOUS PIXELS
-def get_transforms(train):
+def get_transforms(train, means, stds):
     if train:
         transforms = A.Compose([
-        A.Crop(x_min=650, y_min=200, x_max=1450, y_max=900, always_apply=False, p=1.0),
+        # A.Crop(x_min=650, y_min=200, x_max=1450, y_max=900, always_apply=False, p=1.0),
         A.Flip(p=0.5),
-        A.ShiftScaleRotate(always_apply=False, p=0.5, shift_limit=(-0.06, 0.06), scale_limit=(-0.1, 0.1), rotate_limit=(-5, 5), interpolation=0, border_mode=0, value=(0.5482, 0.4620, 0.3602, 0.0142), mask_value=None),
-        A.Normalize(mean=(0.5482, 0.4620, 0.3602, 0.0142), std=(0.1639, 0.1761, 0.2659, 0.0036), max_pixel_value=1.0, always_apply=False, p=1.0)
+        A.ShiftScaleRotate(always_apply=False, p=0.5, shift_limit=(-0.06, 0.06), scale_limit=(-0.1, 0.1), rotate_limit=(-5, 5), interpolation=0, border_mode=0, value=means, mask_value=None),
+        A.Normalize(mean=means, std=stds, max_pixel_value=1.0, always_apply=False, p=1.0)
         ])
     else:
         transforms =  A.Compose([
-        A.Crop(x_min=650, y_min=200, x_max=1450, y_max=900, always_apply=False, p=1.0),
-        A.Normalize(mean=(0.5482, 0.4620, 0.3602, 0.0142), std=(0.1639, 0.1761, 0.2659, 0.0036), max_pixel_value=1.0, always_apply=False, p=1.0)
+        # A.Crop(x_min=650, y_min=200, x_max=1450, y_max=900, always_apply=False, p=1.0),
+        A.Normalize(mean=means, std=stds, max_pixel_value=1.0, always_apply=False, p=1.0)
         ])
     return transforms
 
@@ -169,7 +137,7 @@ def get_transforms(train):
 def get_RGB_transforms(train):
     if train:
         transforms = A.Compose([
-        A.Crop(x_min=650, y_min=200, x_max=1450, y_max=900, always_apply=False, p=1.0),
+        # A.Crop(x_min=650, y_min=200, x_max=1450, y_max=900, always_apply=False, p=1.0),
         A.Flip(p=0.5),
         A.ShiftScaleRotate(always_apply=False, p=0.5, shift_limit=(-0.06, 0.06), scale_limit=(-0.1, 0.1), rotate_limit=(-5, 5), interpolation=0, border_mode=0, value=(0.5482, 0.4620, 0.3602), mask_value=None),
         A.Normalize(mean=(0.5482, 0.4620, 0.3602), std=(0.1639, 0.1761, 0.2659), max_pixel_value=1.0, always_apply=False, p=1.0)
@@ -177,7 +145,7 @@ def get_RGB_transforms(train):
         ])
     else:
         transforms =  A.Compose([
-        A.Crop(x_min=650, y_min=200, x_max=1450, y_max=900, always_apply=False, p=1.0),
+        # A.Crop(x_min=650, y_min=200, x_max=1450, y_max=900, always_apply=False, p=1.0),
         A.Normalize(mean=(0.5482, 0.4620, 0.3602), std=(0.1639, 0.1761, 0.2659), max_pixel_value=1.0, always_apply=False, p=1.0)    
         ])
     return transforms
@@ -187,16 +155,16 @@ def get_RGB_transforms(train):
 def get_D_transforms(train):
     if train:
         transforms = A.Compose([
-        A.Crop(x_min=650, y_min=200, x_max=1450, y_max=900, always_apply=False, p=1.0),
+        # A.Crop(x_min=650, y_min=200, x_max=1450, y_max=900, always_apply=False, p=1.0),
         A.Flip(p=0.5),
         A.ShiftScaleRotate(always_apply=False, p=0.5, shift_limit=(-0.06, 0.06), scale_limit=(-0.1, 0.1), rotate_limit=(-5, 5), interpolation=0, border_mode=0, value=(0.0142), mask_value=None),
         A.Normalize(mean=(0.0142), std=(0.0036), max_pixel_value=1.0, always_apply=False, p=1.0)
         ])
     else:
         transforms =  A.Compose([
-        A.Crop(x_min=650, y_min=200, x_max=1450, y_max=900, always_apply=False, p=1.0),
+        # A.Crop(x_min=650, y_min=200, x_max=1450, y_max=900, always_apply=False, p=1.0),
         A.Normalize(mean=(0.0142), std=(0.0036), max_pixel_value=1.0, always_apply=False, p=1.0)
-        
         
         ])
     return transforms
+# %%

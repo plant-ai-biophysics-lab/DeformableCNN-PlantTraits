@@ -30,30 +30,33 @@ ConvType      = 'deformable'
 training_category = 'MIMO' #'MIMO', 'MISO', 'SIMO', 'SISO'
 
 
+# Multi-input, multi-output model
 if training_category   == 'MIMO':
     transform_type = get_transforms(train=False) 
-    inputs=['RGB-D']
-    outputs=['All']
-    NumOutputs    = 5
+    inputs = ['RGB-D']
+    outputs = ['ALL']
+    NumOutputs = 5
     
+# Multi-input, single-output model
 elif training_category == 'MISO':
     transform_type = get_transforms(train=False)
-    inputs=['RGB-D']
-    outputs=['FW','DW','H','D','LA']
-    NumOutputs    = 1
+    inputs = ['RGB-D']
+    outputs = ['FreshWeightShoot','DryWeightShoot','Height','Diameter','LeafArea'] #Put the names of each output here
+    NumOutputs = 1
     
+# Single-input, multi-output model
 elif training_category == 'SIMO':
     transform_type = get_RGB_transforms(train=False)
-    inputs=['RGB','D']
-    outputs=['All']
-    NumOutputs    = 5
+    inputs = ['RGB','D']
+    outputs = ['ALL']
+    NumOutputs = 5
     
+# Single-input, single-output model
 elif training_category == 'SISO':
     transform_type = get_RGB_transforms(train=False)
-    
-    inputs =['RGB','D']
-    outputs=['FW','DW','H','D','LA']
-    NumOutputs    = 1
+    inputs = ['RGB','D']
+    outputs = ['FreshWeightShoot','DryWeightShoot','Height','Diameter','LeafArea']
+    NumOutputs = 1
     
     
     
@@ -62,8 +65,8 @@ dataset = GreenhouseDataset(rgb_dir=RGB_Data_Dir, d_dir=Depth_Data_Dir, jsonfile
 dataset.df= dataset.df.iloc[:-50]
 
 
-
-train_split, val_split = train_test_split(dataset.df, test_size=0.2, random_state=split_seed, stratify=dataset.df['Variety'])
+#change dataset.df['outputs'].str['classification'] to None if you dont have any class information to stratify based on)
+train_split, val_split = train_test_split(dataset.df, test_size=0.2, random_state=split_seed, stratify=dataset.df['outputs'].str['classification']) 
 
 train = torch.utils.data.Subset(dataset, train_split.index.tolist())
 val   = torch.utils.data.Subset(dataset, val_split.index.tolist())
