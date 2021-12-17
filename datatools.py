@@ -74,6 +74,7 @@ class GreenhouseDataset(Dataset):
         self.d_dir=d_dir
         self.input=input
         self.output=output
+        self.num_outputs=len(self.df.iloc[0]['outputs']['regression'])
         
 
     def __getitem__(self, idx):
