@@ -18,7 +18,7 @@ In order to use this implementation with this your own custom, make a custom jso
 
 `{"image":{"0":"RGB_27.png","1":"RGB_79.png"},"depth_image":{"0":"Depth_27.png","1":"Depth_79.png"},"outputs":{"0":{"regression":{"FreshWeightShoot":5.5,"DryWeightShoot":0.42,"Height":9.0,"Diameter":11.0,"LeafArea":153.9},"classification":"Lugano"},"1":{"regression":{"FreshWeightShoot":30.3,"DryWeightShoot":1.92,"Height":8.8,"Diameter":20.2,"LeafArea":582.3},"classification":"Lugano"}}}`
 
-This example has two datapoints. which each have an rgb and depth image along with 5 regression outputs FreshWeightShoot, DryWeightShoot, Height, Diameter, LeafArea and one class outputs Variety. The classification output is optional and can be left blank. Just change image, variables names (FreshWeightShoot) and variable values (5.5) according to your data.
+This file for this template is provided in the repo and is called `template.json`. This example has two datapoints, which each have an rgb and depth image along with 5 regression outputs; FreshWeightShoot, DryWeightShoot, Height, Diameter, LeafArea and one class output, Variety. The classification output is optional and can be left blank. Just change image names (RGB_27.png), variables names (FreshWeightShoot) and variable values (5.5) according to your data.
 
 ## Acknowledgments
 
