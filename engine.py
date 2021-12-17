@@ -1,15 +1,15 @@
-from datatools import get_RGB_transforms, get_D_transforms, get_transforms
+from datatools import get_transforms
 import torch
 def train_single_epoch(model, dataset, device, criterion, optimizer, writer, epoch, train_loader):
     model.train()
                         
                         
     if dataset.input=='RGB':
-        dataset.transforms=get_RGB_transforms(train=True)
+        dataset.transforms=get_transforms(train=True,means=dataset.means[:3], stds=dataset.stds[:3])
     elif dataset.input=='D':
-        dataset.transforms=get_D_transforms(train=True)
+        dataset.transforms=get_transforms(train=True, means=dataset.means[3:], stds=dataset.stds[3:])
     elif dataset.input=='RGB-D': 
-        dataset.transforms=get_transforms(train=True)
+        dataset.transforms=get_transforms(train=True, means=dataset.means, stds=dataset.stds)
                         
     for i, (rgbd, targets)  in enumerate(train_loader):
         rgbd=rgbd.to(device)
@@ -37,14 +37,15 @@ def validate(model, dataset, device, training_category, sav_dir, criterion, writ
     # training_val_loss=0s           
                         
     model.eval()
-    print('val')
+    print('Validating and Checkpointing!')
                         
     if dataset.input=='RGB':
-        dataset.transforms=get_RGB_transforms(train=False)
+        dataset.transforms=get_transforms(train=False,means=dataset.means[:3], stds=dataset.stds[:3])
     elif dataset.input=='D':
-        dataset.transforms=get_D_transforms(train=False)
+        dataset.transforms=get_transforms(train=False, means=dataset.means[3:], stds=dataset.stds[3:])
     elif dataset.input=='RGB-D': 
-        dataset.transforms=get_transforms(train=False)
+        dataset.transforms=get_transforms(train=False,means=dataset.means, stds=dataset.stds)
+                        
     with torch.no_grad():
         for i, (rgbd, targets) in enumerate(val_loader):
 

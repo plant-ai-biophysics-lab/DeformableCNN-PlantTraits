@@ -132,39 +132,4 @@ def get_transforms(train, means, stds):
         ])
     return transforms
 
-
-
-def get_RGB_transforms(train):
-    if train:
-        transforms = A.Compose([
-        # A.Crop(x_min=650, y_min=200, x_max=1450, y_max=900, always_apply=False, p=1.0),
-        A.Flip(p=0.5),
-        A.ShiftScaleRotate(always_apply=False, p=0.5, shift_limit=(-0.06, 0.06), scale_limit=(-0.1, 0.1), rotate_limit=(-5, 5), interpolation=0, border_mode=0, value=(0.5482, 0.4620, 0.3602), mask_value=None),
-        A.Normalize(mean=(0.5482, 0.4620, 0.3602), std=(0.1639, 0.1761, 0.2659), max_pixel_value=1.0, always_apply=False, p=1.0)
-   
-        ])
-    else:
-        transforms =  A.Compose([
-        # A.Crop(x_min=650, y_min=200, x_max=1450, y_max=900, always_apply=False, p=1.0),
-        A.Normalize(mean=(0.5482, 0.4620, 0.3602), std=(0.1639, 0.1761, 0.2659), max_pixel_value=1.0, always_apply=False, p=1.0)    
-        ])
-    return transforms
-
-
-
-def get_D_transforms(train):
-    if train:
-        transforms = A.Compose([
-        # A.Crop(x_min=650, y_min=200, x_max=1450, y_max=900, always_apply=False, p=1.0),
-        A.Flip(p=0.5),
-        A.ShiftScaleRotate(always_apply=False, p=0.5, shift_limit=(-0.06, 0.06), scale_limit=(-0.1, 0.1), rotate_limit=(-5, 5), interpolation=0, border_mode=0, value=(0.0142), mask_value=None),
-        A.Normalize(mean=(0.0142), std=(0.0036), max_pixel_value=1.0, always_apply=False, p=1.0)
-        ])
-    else:
-        transforms =  A.Compose([
-        # A.Crop(x_min=650, y_min=200, x_max=1450, y_max=900, always_apply=False, p=1.0),
-        A.Normalize(mean=(0.0142), std=(0.0036), max_pixel_value=1.0, always_apply=False, p=1.0)
-        
-        ])
-    return transforms
 # %%
