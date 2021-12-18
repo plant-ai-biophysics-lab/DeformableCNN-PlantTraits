@@ -51,7 +51,9 @@ In order to use this implementation with custom data, create a json file with th
 }
 ```
 
-This file for this template is provided in the repo and is called `template.json`. This example has two datapoints, which each have an rgb and depth image along with 5 regression outputs; FreshWeightShoot, DryWeightShoot, Height, Diameter, LeafArea and one class output, Variety. The classification output is optional and can be left blank. Just change image names (RGB_27.png), variables names (FreshWeightShoot) and variable values (5.5) according to your data. You are free to any number of regression variables/outputs
+This file for this template is provided in the repo and is called `template.json`. This example has two datapoints, which each have an rgb and depth image along with 5 regression outputs; FreshWeightShoot, DryWeightShoot, Height, Diameter, LeafArea and one class output, Variety. The classification output is optional and can be left blank. Just change image names (RGB_27.png), variables names (FreshWeightShoot) and variable values (5.5) according to your data. You are free to any number of regression variables/outputs.
+
+After creating the JSON file, change the paths of `RGB_Data_Dir`, `Depth_Data_Dir` and `JSON_Files_Dir`according to your data.
 
 ## Acknowledgments
 
