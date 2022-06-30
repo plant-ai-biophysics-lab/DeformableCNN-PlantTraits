@@ -93,9 +93,9 @@ class GreenhouseMidFusionRegressor(torch.nn.Module):
 
             if self.input_data_type=='D':
                 if conv_type=='deformable':
-                    self.encoder=nn.Sequential(DeformConv2d(1, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False),nn.ReLU, self.encoder)
+                    self.encoder=nn.Sequential(DeformConv2d(1, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False),nn.ReLU(), self.encoder)
                 else:
-                    self.encoder=nn.Sequential(nn.Conv2d(1, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False),nn.ReLU, self.encoder)
+                    self.encoder=nn.Sequential(nn.Conv2d(1, 3, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False),nn.ReLU(), self.encoder)
             self.first_linear=nn.Linear(1000, 512)
             self.second_linear=nn.Linear(512, 256)
             self.final_linear=nn.Linear(256, num_outputs)
